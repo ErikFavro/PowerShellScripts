@@ -6,6 +6,8 @@
    .PARAMETER 
         -WhatIf is required if you want the script to take any action (use $False to override).  This was set up for a fail safe to force the technician to override.
    
+		Good test command for auditing campus
+        Disable-MoveOldADComputers.ps1 -SearchBaseOU "OU=Your,DC=OU" -ConfigMgrClientAudit $true
    .SYNTAX
    .NOTES
 		Things to do before you start:
@@ -53,7 +55,7 @@ Try {
        
     #Make sure to fill out all these variables to what you want
     $OutputFileLocation = "C:\Temp\"
-    $OutputFileName = "AD-Object-Cleanup.csv"
+    $OutputFileName = "RenameResults" + " - " + ((Get-Date).ToString("HHmmss")) + ".csv"
     $SiteServer = "CHANGE TO YOUR SITE SERVER NAME"
     $SiteCode = "YOUR SITE CODES GOES HERE"
     $OSManufacturer = "Windows*"
