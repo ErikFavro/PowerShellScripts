@@ -1,18 +1,23 @@
 ﻿#Gather faulty scheduled tasks
-$task = Get-ScheduledTask | where TaskPath -match 'EnterpriseMgmt' | select TaskPath | Select-String -Pattern [0-9] | Get-Unique
-$task = $task.ToString()
-$task = $task.Substring($task.length -38, 36)
-
-#Gather all registry enrollment IDs
-$registrykey = Get-Item HKLM:\SOFTWARE\Microsoft\Enrollments\* | select Name, PSChildName
+$SchedTasks = Get-ScheduledTask | Where-Object { $_.TaskPath -like "*Microsoft*Windows*EnterpriseMgmt\*" } | Select-Object -ExpandProperty TaskPath -Unique | Where-Object { $_ -like "*-*-*" } | Split-Path -Leaf
 
 #Remove Intune Enrollment scheduled tasks
-Get-ScheduledTask | where TaskPath -match 'EnterpriseMgmt' | Unregister-ScheduledTask -Confirm:$false
-
-#Clean up registry that matches scheduled task ID
-foreach ($Value in $registrykey){
-    if ($Value.PSChildName -eq $task){
-        $RegToRemove = $Value.PSChildName
-        Remove-Item HKLM:\SOFTWARE\Microsoft\Enrollments\$RegToRemove -Recurse -Force -Verbose
-    }
+foreach ($TaskToClean in $SchedTasks){
+    Get-ScheduledTask | Where-Object {$_.TaskPath -match $TaskToClean} | Unregister-ScheduledTask -Confirm:$false
 }
+
+#Clean registry 
+$RegistryKeys = Get-ChildItem HKLM:\Software\Microsoft\Enrollments\* | ForEach-Object { Get-ItemProperty $_.PSPath }| Where-Object { $_ -like "*fooUser*" } | Select PSPath
+
+Foreach ($Key in $RegistryKeys){
+    Remove-Item $RegistryKeys.PSPath -Recurse -Force
+}
+
+#Nuke enrollment cert for MDM
+Get-ChildItem 'Cert:\LocalMachine\My\' | ? Issuer -EQ "CN=Microsoft Intune MDM Device CA" | % {
+     Write-Host " - Removing Intune certificate $($_.DnsNameList.Unicode)"
+     Remove-Item $_.PSPath
+}
+
+#Restart ConfigMgr
+Restart-Service -Name "ccmexec" -Force -ErrorAction Stop
