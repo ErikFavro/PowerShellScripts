@@ -1,7 +1,8 @@
-﻿$ComputerToAudit = Read-Host -Prompt "Please enter a computer name"
+﻿#Gather computer name
+$ComputerToAudit = Read-Host -Prompt "Please enter a computer name"
 
-#omit not domained users, anything with default in it?
-$ExcludeUsers = @("Public", "*Default*", "All Users", "*Administrator*", "Guest", "ADMINI~1")
+#Gather profiles to audit
+$ExcludeUsers = @("Public", "*Default*", "All Users", "*Administrator*", "Guest", "ADMINI~1", "*WWU*")
 $UserList = @(Get-ChildItem "\\$ComputerToAudit\C$\Users" | Select Name)
 $localUserList = @(Invoke-Command -ComputerName "$ComputerToAudit" -ScriptBlock {Get-LocalUser} | Select Name)
 
