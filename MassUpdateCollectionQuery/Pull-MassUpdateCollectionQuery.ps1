@@ -8,10 +8,14 @@ foreach ($ProcessColelction in $GatheredCollections){
     $ObjectResults = [PSCustomObject]@{
         "CollectionName"  = $ProcessColelction.CollectionName
         "CollectionID"    = $ProcessColelction.CollectionID
+        "RuleName"        = ""
         "QueryExpression" = ""
     }
 
-    $ObjectResults.QueryExpression = (Get-CMDeviceCollectionQueryMembershipRule -CollectionId $ProcessColelction.CollectionID).QueryExpression
+    $CurrentValue = @()
+    $CurrentValue = Get-CMDeviceCollectionQueryMembershipRule -CollectionId $ProcessColelction.CollectionID | Select QueryExpression, RuleName
+    $ObjectResults.QueryExpression = $CurrentValue.QueryExpression
+    $ObjectResults.RuleName = $CurrentValue.RuleName
 
     $Results += $ObjectResults
 }

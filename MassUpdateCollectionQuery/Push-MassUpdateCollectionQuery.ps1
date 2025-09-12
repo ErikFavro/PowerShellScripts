@@ -1,13 +1,14 @@
-﻿$GatheredCollections = Import-Csv -Path "C:\Temp\CollectionGather.csv"
-$OutputFile = "C:\Temp\CollectionWithQuery.csv"
+﻿$UpdateCollections = Import-Csv -Path "C:\Temp\CollectionWithQuery.csv"
+$OutputFile = "C:\Temp\UpdatedQueryResults.csv"
 $Results = @()
 $ObjectResults = @()
 
-foreach ($ProcessColelction in $GatheredCollections){
+foreach ($ProcessColelction in $UpdateCollections){
 
     $ObjectResults = [PSCustomObject]@{
         "CollectionName"  = $ProcessColelction.CollectionName
         "CollectionID"    = $ProcessColelction.CollectionID
+        "RuleName"        = ""
         "QueryExpression" = ""
     }
 
