@@ -13,6 +13,9 @@ Foreach ($Key in $RegistryKeys){
     Remove-Item $RegistryKeys.PSPath -Recurse -Force
 }
 
+#Clear enrollment flag of 2 and set back to 0 if needed
+Set-ItemProperty HKLM:\SOFTWARE\Microsoft\Enrollments\ -Name MmpcEnrollmentFlag -Value 0
+
 #Nuke enrollment cert for MDM
 Get-ChildItem 'Cert:\LocalMachine\My\' | ? Issuer -EQ "CN=Microsoft Intune MDM Device CA" | % {
      Write-Host " - Removing Intune certificate $($_.DnsNameList.Unicode)"
