@@ -1,4 +1,13 @@
-﻿$GatheredCollections = Import-Csv -Path "C:\Temp\CollectionGather.csv"
+﻿# CollectionGather.csv should have 2 headers, CollectionName and CollectionID
+# The name is required but not used, more cosmetic so we can see what we're altering
+# Example
+# CollectionName	            CollectionID
+# AASAC Workstations	        WWU00403
+# AASAC Workstations - Kiosk	WWU00C12
+# AASAC Workstations - Tech	    WWU00AB9
+
+
+$GatheredCollections = Import-Csv -Path "C:\Temp\CollectionGather.csv"
 $OutputFile = "C:\Temp\CollectionWithQuery.csv"
 $Results = @()
 $ObjectResults = @()
