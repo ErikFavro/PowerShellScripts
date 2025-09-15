@@ -3,18 +3,9 @@ $OutputFile = "C:\Temp\UpdatedQueryResults.csv"
 $Results = @()
 $ObjectResults = @()
 
-foreach ($ProcessColelction in $UpdateCollections){
+foreach ($ProcessCollection in $UpdateCollections){
 
-    $ObjectResults = [PSCustomObject]@{
-        "CollectionName"  = $ProcessColelction.CollectionName
-        "CollectionID"    = $ProcessColelction.CollectionID
-        "RuleName"        = ""
-        "QueryExpression" = ""
-    }
+    Remove-CMDeviceCollectionQueryMembershipRule -CollectionId $ProcessCollection.CollectionID -RuleName $ProcessCollection.RuleName -Force -Confirm:$false -Verbose
+    Add-CMDeviceCollectionQueryMembershipRule -CollectionId $ProcessCollection.CollectionID -RuleName $ProcessCollection.RuleName -QueryExpression $ProcessCollection.QueryExpression
 
-    $ObjectResults.QueryExpression = (Get-CMDeviceCollectionQueryMembershipRule -CollectionId $ProcessColelction.CollectionID).QueryExpression
-
-    $Results += $ObjectResults
 }
-
-$Results | Export-Csv -Path $OutputFile -NoTypeInformation

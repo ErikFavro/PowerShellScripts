@@ -3,21 +3,28 @@ $OutputFile = "C:\Temp\CollectionWithQuery.csv"
 $Results = @()
 $ObjectResults = @()
 
-foreach ($ProcessColelction in $GatheredCollections){
-
-    $ObjectResults = [PSCustomObject]@{
-        "CollectionName"  = $ProcessColelction.CollectionName
-        "CollectionID"    = $ProcessColelction.CollectionID
-        "RuleName"        = ""
-        "QueryExpression" = ""
-    }
+foreach ($ProcessCollection in $GatheredCollections){
 
     $CurrentValue = @()
-    $CurrentValue = Get-CMDeviceCollectionQueryMembershipRule -CollectionId $ProcessColelction.CollectionID | Select QueryExpression, RuleName
-    $ObjectResults.QueryExpression = $CurrentValue.QueryExpression
-    $ObjectResults.RuleName = $CurrentValue.RuleName
+    $CurrentValue = Get-CMDeviceCollectionQueryMembershipRule -CollectionId $ProcessCollection.CollectionID
 
-    $Results += $ObjectResults
+    foreach ($CurrentQuery in $CurrentValue){
+        
+        $ObjectResults = [PSCustomObject]@{
+            "CollectionName"  = $ProcessCollection.CollectionName
+            "CollectionID"    = $ProcessCollection.CollectionID
+            "RuleName"        = ""
+            "QueryExpression" = ""
+            "QueryID"          = ""
+        }
+        
+        If ($CurrentQuery.QueryExpression -like "*UNIV.DIR.WWU.EDU/MANAGED*"){
+            $ObjectResults.QueryExpression = $CurrentQuery.QueryExpression
+            $ObjectResults.RuleName = $CurrentQuery.RuleName
+            $ObjectResults.QueryID = $CurrentQuery.QueryID
+            $Results += $ObjectResults
+        }
+    }
 }
 
 $Results | Export-Csv -Path $OutputFile -NoTypeInformation
